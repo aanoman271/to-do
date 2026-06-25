@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import { model, models, Schema } from "mongoose";
 import { ITask } from "../types/task";
 
 const taskSchema = new Schema<ITask>(
@@ -21,4 +21,4 @@ const taskSchema = new Schema<ITask>(
     timestamps: true,
   },
 );
-export const Task = model<ITask>("Task", taskSchema);
+export const Task = models.Task || model("Task", taskSchema);
