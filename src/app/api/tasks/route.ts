@@ -40,3 +40,35 @@ export const GET = async () => {
     }
   }
 };
+export const PATCH = async (req: Request) => {
+  try {
+    await connectDB();
+
+    const body = await req.json();
+    const { params, status } = body;
+    if (!params?.id || !status) {
+      return NextResponse.json(
+        { message: "do not change task status" },
+        { status: 400 },
+      );
+    }
+    const updatedTask = await Task.findOneAndUpdate(
+      { _id: params.id },
+      { status: status },
+      { new: true },
+    );
+    if (!updatedTask) {
+      return NextResponse.json({ message: "Task not found" }, { status: 404 });
+    }
+    return NextResponse.json(updatedTask, { status: 200 });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(`Status update failed: ${error.message}`);
+      return NextResponse.json({ message: error.message }, { status: 500 });
+    }
+    return NextResponse.json(
+      { message: "An unknown error occurred" },
+      { status: 500 },
+    );
+  }
+};
