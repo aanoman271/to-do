@@ -27,3 +27,16 @@ export const POST = async (req: Request) => {
     }
   }
 };
+export const GET = async () => {
+  try {
+    await connectDB();
+    const allTasks = await Task.find().sort({ updatedAt: -1 });
+    return NextResponse.json(allTasks, { status: 200 });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(`Database connection failed: ${error.message}`);
+    } else {
+      console.error("An unknown error occurred");
+    }
+  }
+};
