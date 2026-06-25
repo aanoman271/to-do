@@ -6,11 +6,13 @@ import { updateStatus } from "./api call/updateStatus";
 import { deleteTask } from "./api call/deleteTask";
 import { addTask } from "./api call/postTask";
 import { Task } from "@/types/task";
+import TaskSkeleton from "./loading";
 
 const Page = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
-
+  const [loddin, setIsLoading] = useState(false);
+  // status handeler
   const handleStatusChange = async (id: string, newStatus: Task["status"]) => {
     const originalTasks = [...tasks];
 
@@ -64,9 +66,12 @@ const Page = () => {
   };
   useEffect(() => {
     const loadTasks = async () => {
+      setIsLoading(true);
       const data = await getAllTask();
       setTasks(data);
+      setIsLoading(false);
     };
+
     loadTasks();
   }, []);
 
@@ -81,53 +86,56 @@ const Page = () => {
       </button>
 
       {/* Task Grid */}
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {tasks.map((task) => (
-          <div
-            key={task._id}
-            className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <h3 className="text-white font-bold text-sm">{task.title}</h3>
+      {loddin ? (
+        <TaskSkeleton></TaskSkeleton>
+      ) : (
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {tasks.map((task) => (
+            <div
+              key={task._id}
+              className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <h3 className="text-white font-bold text-sm">{task.title}</h3>
 
-                {/* Dropdown Action */}
-                <select
-                  value={task.status}
-                  onChange={(e) =>
-                    handleStatusChange(
-                      task._id,
-                      e.target.value as Task["status"],
-                    )
-                  }
-                  className="bg-zinc-950 border border-zinc-800 text-xs text-zinc-400 rounded px-2 py-1 cursor-pointer focus:outline-none"
+                  {/* Dropdown Action */}
+                  <select
+                    value={task.status}
+                    onChange={(e) =>
+                      handleStatusChange(
+                        task._id,
+                        e.target.value as Task["status"],
+                      )
+                    }
+                    className="bg-zinc-950 border border-zinc-800 text-xs text-zinc-400 rounded px-2 py-1 cursor-pointer focus:outline-none"
+                  >
+                    <option value="todo">Todo</option>
+                    <option value="in-progress">In-Progress</option>
+                    <option value="completed">Completed</option>
+                  </select>
+                </div>
+                <p className="text-zinc-400 text-xs">{task.description}</p>
+              </div>
+
+              {/* Footer: Status & Delete Button */}
+              <div className="flex items-center justify-between mt-4 border-t border-zinc-800 pt-2">
+                <div className="text-[10px] uppercase font-mono text-zinc-500">
+                  Status: <span className="text-indigo-400">{task.status}</span>
+                </div>
+
+                {/* 🗑️ ডিলিট বাটন */}
+                <button
+                  onClick={() => handleDeleteTask(task._id)}
+                  className="text-[10px] font-mono text-red-500 hover:text-red-400 uppercase tracking-wider cursor-pointer transition-colors px-1.5 py-0.5 rounded hover:bg-red-500/10"
                 >
-                  <option value="todo">Todo</option>
-                  <option value="in-progress">In-Progress</option>
-                  <option value="completed">Completed</option>
-                </select>
+                  [Delete]
+                </button>
               </div>
-              <p className="text-zinc-400 text-xs">{task.description}</p>
             </div>
-
-            {/* Footer: Status & Delete Button */}
-            <div className="flex items-center justify-between mt-4 border-t border-zinc-800 pt-2">
-              <div className="text-[10px] uppercase font-mono text-zinc-500">
-                Status: <span className="text-indigo-400">{task.status}</span>
-              </div>
-
-              {/* 🗑️ ডিলিট বাটন */}
-              <button
-                onClick={() => handleDeleteTask(task._id)}
-                className="text-[10px] font-mono text-red-500 hover:text-red-400 uppercase tracking-wider cursor-pointer transition-colors px-1.5 py-0.5 rounded hover:bg-red-500/10"
-              >
-                [Delete]
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-
+          ))}
+        </div>
+      )}
       {/* Simple Popup Modal */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/80 p-4">
