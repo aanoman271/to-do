@@ -13,7 +13,7 @@ const taskSchema = new Schema<ITask>(
     },
     status: {
       type: String,
-      enum: ["todo", "in-progress", "done"],
+      enum: ["todo", "in-progress", "completed"],
       default: "todo",
     },
   },
