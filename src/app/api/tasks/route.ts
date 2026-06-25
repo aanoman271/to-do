@@ -1,6 +1,8 @@
 import connectDB from "@/app/lib/db";
 import { Task } from "@/app/model/taskModel";
 import { NextResponse } from "next/server";
+
+// add task
 export const POST = async (req: Request) => {
   try {
     await connectDB();
@@ -19,10 +21,9 @@ export const POST = async (req: Request) => {
 
     return NextResponse.json(newTask, { status: 201 });
   } catch (error) {
-    // ⚠️ এই ক্যাচ ব্লকটা ফিক্স করা হয়েছে যেন সার্ভার ক্র্যাশ না করে প্রপার রেসপন্স যায়
     if (error instanceof Error) {
       console.error(`Database connection failed: ${error.message}`);
-      return NextResponse.json({ message: error.message }, { status: 500 }); // 👈 এই রিটার্নটা মিসিং ছিল
+      return NextResponse.json({ message: error.message }, { status: 500 });
     }
 
     return NextResponse.json(
@@ -31,6 +32,7 @@ export const POST = async (req: Request) => {
     );
   }
 };
+// get api
 export const GET = async () => {
   try {
     await connectDB();
@@ -44,6 +46,7 @@ export const GET = async () => {
     }
   }
 };
+// update status
 export const PATCH = async (req: Request) => {
   try {
     await connectDB();
